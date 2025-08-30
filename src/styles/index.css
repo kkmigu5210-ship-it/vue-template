@@ -1,0 +1,89 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 全局样式 */
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+#app {
+  height: 100%;
+}
+
+/* 自定义滚动条样式 */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Ant Design 组件样式覆盖 */
+.ant-layout {
+  min-height: 100vh;
+}
+
+.ant-layout-sider {
+  box-shadow: 2px 0 6px rgba(0, 21, 41, 0.35);
+}
+
+.ant-menu-dark {
+  background: #001529;
+}
+
+.ant-menu-dark .ant-menu-item-selected {
+  background-color: #1890ff;
+}
+
+/* 页面过渡动画 */
+.page-enter-active,
+.page-leave-active {
+  transition: all 0.3s;
+}
+
+.page-enter-from,
+.page-leave-to {
+  opacity: 0;
+  transform: translate3d(10px, 0, 0);
+}
+
+/* 卡片样式 */
+.content-card {
+  @apply bg-white rounded-lg shadow-sm border border-gray-200;
+}
+
+/* 搜索表单样式 */
+.search-form {
+  @apply mb-4 p-4 bg-white rounded-lg shadow-sm border border-gray-200;
+}
+
+/* 表格工具栏样式 */
+.table-toolbar {
+  @apply flex justify-between items-center mb-4;
+}
+
+/* 按钮组样式 */
+.btn-group {
+  @apply flex gap-2;
+}
