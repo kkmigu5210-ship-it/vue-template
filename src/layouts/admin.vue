@@ -26,7 +26,7 @@
           </span>
         </div>
       </div>
-      
+
       <!-- 菜单 -->
       <SideMenu />
     </a-layout-sider>
@@ -55,7 +55,7 @@
               <MenuFoldOutlined v-else />
             </template>
           </a-button>
-          
+
           <!-- 面包屑 -->
           <a-breadcrumb class="hidden sm:block">
             <a-breadcrumb-item v-for="item in appStore.breadcrumbs" :key="item.title">
@@ -66,7 +66,7 @@
             </a-breadcrumb-item>
           </a-breadcrumb>
         </div>
-        
+
         <!-- 右侧 -->
         <div class="flex items-center space-x-2 md:space-x-4">
           <!-- 主题切换 -->
@@ -80,7 +80,7 @@
               <BulbOutlined v-else />
             </template>
           </a-button>
-          
+
           <!-- 用户菜单 -->
           <a-dropdown>
             <div class="flex items-center space-x-2 cursor-pointer px-2 md:px-3 py-2 rounded hover:bg-gray-50">
@@ -138,6 +138,7 @@ import {
 import { useAuthStore } from '@/stores/auth'
 import { useAppStore } from '@/stores/app'
 import SideMenu from '@/components/SideMenu.vue'
+import {ROUTE_PATHS} from "@/utils/route.ts";
 
 const router = useRouter()
 const route = useRoute()
@@ -179,7 +180,7 @@ const handleLogout = () => {
     content: '确定要退出登录吗？',
     onOk: async () => {
       await authStore.logout()
-      router.push('/login')
+      await router.push(ROUTE_PATHS.LOGIN)
     },
   })
 }
@@ -188,14 +189,14 @@ const handleLogout = () => {
 const updateBreadcrumbs = () => {
   const breadcrumbs = []
   const matched = route.matched.filter(item => item.meta?.title)
-  
+
   matched.forEach(item => {
     breadcrumbs.push({
       title: item.meta?.title as string,
       path: item.path === route.path ? undefined : item.path,
     })
   })
-  
+
   appStore.setBreadcrumbs(breadcrumbs)
 }
 

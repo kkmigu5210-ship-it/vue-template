@@ -11,15 +11,15 @@ export const getRoutePath = (path: string): string => {
   if (path.startsWith(BASE_URL)) {
     return path
   }
-  
+
   // 确保路径以 / 开头
   const normalizedPath = path.startsWith('/') ? path : `/${path}`
-  
+
   // 如果没有前缀，直接返回路径
   if (!BASE_URL) {
     return normalizedPath
   }
-  
+
   // 拼接前缀和路径
   return `${BASE_URL}${normalizedPath}`
 }
@@ -38,16 +38,16 @@ export const getBaseUrl = (): string => {
 export const ROUTE_PATHS = {
   // 基础路由
   HOME: getRoutePath('/dashboard'),
-  LOGIN: '/login',
-  
+  LOGIN: getRoutePath('/login'),
+
   // 管理后台路由
   ADMIN_ROOT: getRoutePath(''),
   DASHBOARD: getRoutePath('/dashboard'),
-  
+
   // 系统管理
   SYSTEM_USER: getRoutePath('/system/user'),
   SYSTEM_MENU: getRoutePath('/system/menu'),
-  
+
   // 错误页面
   ERROR_401: '/401',
   ERROR_403: '/403',

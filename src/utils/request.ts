@@ -1,6 +1,7 @@
 import axios, { type AxiosInstance, type AxiosRequestConfig, type AxiosResponse } from 'axios'
 import { message } from 'ant-design-vue'
 import type { ApiResponse } from '@/types/api'
+import {authApi} from "@/api";
 
 // 创建 axios 实例
 const request: AxiosInstance = axios.create({
@@ -37,14 +38,14 @@ request.interceptors.request.use(
 
 // 响应拦截器
 request.interceptors.response.use(
-  (response: AxiosResponse<ApiResponse>) => {
+  (response) => {
     const { data } = response
-    
+
     // 如果是文件下载等二进制数据，直接返回
     if (response.config.responseType === 'blob') {
       return response
     }
-    
+
     // 检查业务状态码
     if (data.success) {
       return data
@@ -56,11 +57,11 @@ request.interceptors.response.use(
   },
   async (error) => {
     const originalRequest = error.config
-    
+
     // HTTP 状态码错误处理
     if (error.response) {
       const { status } = error.response
-      
+
       // 401 未授权 - 尝试刷新 token
       if (status === 401 && !originalRequest._retry) {
         if (isRefreshing) {
@@ -69,50 +70,48 @@ request.interceptors.response.use(
             requestQueue.push({ resolve, reject, config: originalRequest })
           })
         }
-        
+
         originalRequest._retry = true
         isRefreshing = true
-        
+
         try {
           const refreshToken = localStorage.getItem('refresh_token')
           if (!refreshToken) {
             throw new Error('No refresh token')
           }
-          
+
           // 刷新 token
-          const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/auth/refresh-token`, {
-            refreshToken
-          })
-          
-          const { data: tokenData } = response.data
-          
+          const response = await authApi.refreshToken({refreshToken})
+
           // 更新 token
-          localStorage.setItem('access_token', tokenData.accessToken)
-          localStorage.setItem('refresh_token', tokenData.refreshToken)
-          
+          localStorage.setItem('access_token', response.data.accessToken)
+          localStorage.setItem('refresh_token', response.data.refreshToken)
+
           // 重新发送原请求
-          originalRequest.headers.Authorization = `Bearer ${tokenData.accessToken}`
-          
+          originalRequest.headers.Authorization = `Bearer ${response.data.accessToken}`
+
           // 处理队列中的请求
           requestQueue.forEach(({ resolve, config }) => {
-            config.headers.Authorization = `Bearer ${tokenData.accessToken}`
+            if (config.headers) {
+              config.headers.Authorization = `Bearer ${response.data.accessToken}`
+            }
             resolve(request(config))
           })
           requestQueue = []
-          
+
           return request(originalRequest)
         } catch (refreshError) {
           // 刷新 token 失败，清除认证信息并跳转到登录页
           localStorage.removeItem('access_token')
           localStorage.removeItem('refresh_token')
           localStorage.removeItem('user_info')
-          
+
           // 拒绝队列中的所有请求
           requestQueue.forEach(({ reject }) => {
             reject(refreshError)
           })
           requestQueue = []
-          
+
           message.error('登录已过期，请重新登录')
           window.location.href = '/login'
           return Promise.reject(refreshError)
@@ -120,7 +119,7 @@ request.interceptors.response.use(
           isRefreshing = false
         }
       }
-      
+
       // 403 禁止访问
       else if (status === 403) {
         message.error('没有权限访问该资源')
@@ -154,7 +153,7 @@ request.interceptors.response.use(
     } else {
       message.error('请求配置错误')
     }
-    
+
     return Promise.reject(error)
   }
 )
@@ -164,19 +163,19 @@ export const http = {
   get<T = any>(url: string, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
     return request.get(url, config)
   },
-  
+
   post<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
     return request.post(url, data, config)
   },
-  
+
   put<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
     return request.put(url, data, config)
   },
-  
+
   delete<T = any>(url: string, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
     return request.delete(url, config)
   },
-  
+
   upload<T = any>(url: string, formData: FormData, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
     return request.post(url, formData, {
       ...config,
@@ -186,7 +185,7 @@ export const http = {
       },
     })
   },
-  
+
   download(url: string, params?: any, filename?: string): Promise<void> {
     return request.get(url, {
       params,

@@ -6,13 +6,13 @@
           <LockOutlined />
         </div>
       </div>
-      
+
       <h1 class="error-code">401</h1>
       <h2 class="error-title">未授权访问</h2>
       <p class="error-description">
         抱歉，您没有权限访问此页面，请先登录
       </p>
-      
+
       <div class="error-actions">
         <a-button type="primary" @click="goLogin">
           重新登录
@@ -33,7 +33,7 @@ import { LockOutlined } from '@ant-design/icons-vue'
 const router = useRouter()
 
 const goLogin = () => {
-  router.push('/login')
+  router.push(ROUTE_PATHS.LOGIN)
 }
 
 const goHome = () => {
