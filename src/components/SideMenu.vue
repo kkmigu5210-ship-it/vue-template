@@ -8,7 +8,7 @@
     @click="handleMenuClick"
   >
     <template v-for="item in menuItems" :key="item.key">
-      <a-sub-menu v-if="item.children && item.children.length > 0" :key="item.key">
+      <a-sub-menu v-if="item.children && item.children.length > 0" :key="`sub-${item.key}`">
         <template #icon>
           <component :is="item.icon" />
         </template>
@@ -24,7 +24,7 @@
           {{ child.title }}
         </a-menu-item>
       </a-sub-menu>
-      <a-menu-item v-else :key="item.key" :title="item.title">
+      <a-menu-item v-else :key="`item-${item.key}`" :title="item.title">
         <template #icon>
           <component :is="item.icon" />
         </template>
@@ -37,45 +37,10 @@
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import {
-  DashboardOutlined,
-  UserOutlined,
-  MenuOutlined,
-  SettingOutlined,
-} from '@ant-design/icons-vue'
-import { ROUTE_PATHS } from '@/utils/route'
+import {menuItems} from '@/router/routes/menu.ts'
 
 const router = useRouter()
 const route = useRoute()
-
-// 菜单配置
-const menuItems = ref([
-  {
-    key: 'dashboard',
-    title: '首页',
-    icon: DashboardOutlined,
-    path: ROUTE_PATHS.DASHBOARD,
-  },
-  {
-    key: 'system',
-    title: '系统管理',
-    icon: SettingOutlined,
-    children: [
-      {
-        key: 'system-user',
-        title: '用户管理',
-        icon: UserOutlined,
-        path: ROUTE_PATHS.SYSTEM_USER,
-      },
-      {
-        key: 'system-menu',
-        title: '菜单管理',
-        icon: MenuOutlined,
-        path: ROUTE_PATHS.SYSTEM_MENU,
-      },
-    ],
-  },
-])
 
 // 选中的菜单项
 const selectedKeys = ref<string[]>([])
@@ -85,7 +50,7 @@ const openKeys = ref<string[]>([])
 // 根据当前路由设置选中状态
 const setSelectedKeys = () => {
   const path = route.path
-  
+
   // 查找匹配的菜单项
   const findMenuKey = (items: any[], currentPath: string): string | null => {
     for (const item of items) {
@@ -105,7 +70,7 @@ const setSelectedKeys = () => {
     }
     return null
   }
-  
+
   const key = findMenuKey(menuItems.value, path)
   if (key) {
     selectedKeys.value = [key]
@@ -129,7 +94,7 @@ const handleMenuClick = ({ key }: { key: string }) => {
     }
     return null
   }
-  
+
   const path = findPath(menuItems.value, key)
   if (path && path !== route.path) {
     router.push(path)

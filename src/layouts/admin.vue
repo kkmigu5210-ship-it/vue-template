@@ -178,16 +178,16 @@ const handleLogout = () => {
   Modal.confirm({
     title: '确认退出',
     content: '确定要退出登录吗？',
-    onOk: async () => {
-      await authStore.logout()
-      await router.push(ROUTE_PATHS.LOGIN)
+    onOk: () => {
+      authStore.logout()
+      router.push(ROUTE_PATHS.LOGIN)
     },
   })
 }
 
 // 根据路由更新面包屑
 const updateBreadcrumbs = () => {
-  const breadcrumbs = []
+  const breadcrumbs: Array<{ title: string; path?: string }> = []
   const matched = route.matched.filter(item => item.meta?.title)
 
   matched.forEach(item => {
